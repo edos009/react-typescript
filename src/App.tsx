@@ -1,16 +1,43 @@
-import React from "react";
+import React, { Component } from "react";
 
-type TitleProps = {
-  title: string;
-  test?: string;
+type CountState = {
+  count: number;
 };
 
-const Title = ({ title, test = "test" }: TitleProps) => (
-  <h1>{` ${title} ${test}`}</h1>
-);
+type CountProps = {
+  title?: string;
+};
+
+class Counter extends Component<CountProps, CountState> {
+  constructor(props: CountProps) {
+    super(props);
+
+    this.state = {
+      count: 0,
+    };
+  }
+
+  componentDidMount(): void {}
+
+  handleClick = () => {
+    this.setState(({ count }) => ({ count: ++count }));
+  };
+
+  render() {
+    return (
+      <div>
+        <h1>
+          {this.props.title}
+          {this.state.count}
+        </h1>
+        <button onClick={this.handleClick}>+1</button>
+      </div>
+    );
+  }
+}
 
 const App = () => {
-  return <Title title="Title" />;
+  return <Counter title="Title Counter: " />;
 };
 
 export default App;
