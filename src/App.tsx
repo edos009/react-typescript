@@ -1,80 +1,137 @@
-// import React, { Component } from "react";
-
-// type CountState = {
-//   count: number;
-// };
-
-// type CountProps = {
-//   title?: string;
-// };
-
-// class Counter extends Component<CountProps, CountState> {
-//   constructor(props: CountProps) {
-//     super(props);
-
-//     this.state = {
-//       count: 0,
-//     };
-//   }
-
-//   componentDidMount(): void {}
-
-//   handleClick = (
-//     e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
-//   ) => {
-//     console.log(e.clientX, e.clientY);
-
-//     this.setState(({ count }) => ({ count: ++count }));
-//   };
-
-//   render() {
-//     return (
-//       <div>
-//         <h1>
-//           {this.props.title}
-//           {this.state.count}
-//         </h1>
-//         <button onClick={this.handleClick}>+1</button>
-//         <a href="/" onClick={this.handleClick}>
-//           Link
-//         </a>
-//       </div>
-//     );
-//   }
-// }
-
-// const App = () => {
-//   return <Counter title="Title Counter: " />;
-// };
-
-// export default App;
-
-//------------------------------------------------------
-
 import React, { Component } from "react";
 
-class Form extends Component {
-  handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    console.log(e.currentTarget);
+type Position = {
+  id: string
+  value: string
+  title: string
+}
+
+type FormState = {
+  inputText: string;
+  textareaText: string;
+  selectText: string;
+  showData: {
+    name: string;
+    text: string;
+    position: string;
+  };
+};
+
+const POSITIONS: Array<Position> = [
+  {
+    id: "fd",
+    value: "Front-end Developer",
+    title: "Front-end Developer",
+  },
+  {
+    id: "bd",
+    value: "Back-end Developer",
+    title: "Back-end Developer",
+  },
+];
+
+const DEFAULT_SELECT_VALUE: string = POSITIONS[0].value;
+const styles: React.CSSProperties = { display: "block", marginBottom: "10px" };
+
+class Form extends Component<{}, FormState> {
+  state = {
+    inputText: "",
+    textareaText: "",
+    selectText: DEFAULT_SELECT_VALUE,
+    showData: {
+      name: "",
+      text: "",
+      position: "",
+    },
   };
 
-  handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  private rootRef = React.createRef<HTMLSelectElement>()
+
+  handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const {
+      target: { value: inputText },
+    } = e;
+    this.setState({ inputText });
+  };
+
+  handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
+    const {
+      target: { value: textareaText },
+    } = e;
+    this.setState({ textareaText });
+  };
+
+  handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+    const {
+      target: { value: selectText },
+    } = e;
+    this.setState({ selectText });
+  };
+
+  handleShow = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
-    console.log("Submitted!");
-    
+    const { inputText, textareaText, selectText } = this.state;
+
+    this.setState({
+      inputText: "",
+      textareaText: "",
+      selectText: DEFAULT_SELECT_VALUE,
+      showData: {
+        name: inputText,
+        text: textareaText,
+        position: selectText,
+      },
+    });
   };
 
   render() {
+    const { inputText, textareaText, selectText, showData } = this.state;
+    const { name, text, position } = showData;
+
     return (
-      <form onSubmit={this.handleSubmit}>
-        <label>Simple text:</label>
-        <input type="text" name="text" onFocus={this.handleFocus} />
-        <button type="submit">Submit</button>
-      </form>
+      <>
+        <form>
+          <label style={styles}>
+            Name:
+            <input
+              type="text"
+              value={inputText}
+              onChange={this.handleInputChange}
+            />
+          </label>
+
+          <label style={styles}>
+            Text:
+            <textarea
+              value={textareaText}
+              onChange={this.handleTextareaChange}
+            />
+          </label>
+
+          <select
+            style={styles}
+            value={selectText}
+            onChange={this.handleSelectChange}
+            ref={this.rootRef}
+          >
+            {POSITIONS.map(({ id, value, title }) => (
+              <option key={id} value={value}>
+                {title}
+              </option>
+            ))}
+          </select>
+
+          <button onClick={this.handleShow}>Show Data</button>
+        </form>
+
+        <h2>{name}</h2>
+        <h3>{text}</h3>
+        <h3>{position}</h3>
+      </>
     );
   }
 }
 
-export default function App() {
-  return <Form />;
-}
+const App: React.FC = () => <Form />;
+
+export default App;
